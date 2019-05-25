@@ -98,15 +98,6 @@ void draw() {
       endShape(CLOSE);
     }
     if (!completedFirstPolygon && outerPolygon.size() > 0) {
-      Point prev = outerPolygon.get(outerPolygon.size() - 1);
-      if (isInsideTriangle(mouseP, LEFT, TOP, RIGHT) && noIntersects(mouseP, outerPolygon, completedPolygons)) {
-        stroke(0);
-      } else{
-        stroke(255, 0, 0);
-      }
-      line(mouseP.x, mouseP.y, prev.x, prev.y);
-      fill(0);
-      stroke(0);
       drawPolygon(outerPolygon, false, -1);
     } 
     else{ // draw all polygons
@@ -122,10 +113,10 @@ void draw() {
         drawPolygon(completedPolygons.get(i), true, i);
       }
       if (isSplitting) {
-        Point prev = currentPolygon.get(currentPolygon.size() - 1);
-        if (noIntersects(mouseP, currentPolygon, completedPolygons)) stroke(0);
-        else stroke(255, 0, 0);
-        line(mouseP.x, mouseP.y, prev.x, prev.y);
+        //Point prev = currentPolygon.get(currentPolygon.size() - 1);
+        //if (noIntersects(mouseP, currentPolygon, completedPolygons)) stroke(0);
+        //else stroke(255, 0, 0);
+        //line(mouseP.x, mouseP.y, prev.x, prev.y);
       }
       stroke(0);
       drawPolygon(currentPolygon, false, -1);
@@ -183,6 +174,15 @@ void mouseClicked() { // TODO: make this more concise
     }
   }
   if (!completedFirstPolygon) { // Note: the "outer" polygon will change after a split
+    if (outerPolygon.size() > 0) {
+      Point prev = outerPolygon.get(outerPolygon.size() - 1);
+      if (!isInsideTriangle(point, LEFT, TOP, RIGHT) || !noIntersects(point, outerPolygon, completedPolygons)) {
+        stroke(255, 0, 0);
+        line(point.x, point.y, prev.x, prev.y);
+        fill(0);
+        stroke(0);
+      }
+    }
     addToOuterPolygon(point); // Note: this assumes that the new point will *never* be the same as a previous point  
   } if (!isSplitting) { // check if it's a valid split
     Point splitPoint = getSplitSpot(point);
@@ -195,6 +195,10 @@ void mouseClicked() { // TODO: make this more concise
     Point otherSplitPoint = getSplitSpot(point);
     if (otherSplitPoint == null) otherSplitPoint = point;
     if ( !noIntersects(otherSplitPoint, currentPolygon, completedPolygons) ) {
+      Point prev = currentPolygon.get(currentPolygon.size() - 1);
+      stroke(255, 0, 0);
+      line(point.x, point.y, prev.x, prev.y);
+      stroke(0);
       return;
     }
     if (polygonToSplit == -1) { // we have not yet defined the polygons we're splitting
